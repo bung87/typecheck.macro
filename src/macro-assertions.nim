@@ -2,11 +2,11 @@ import strformat,options
 
 import @babel/core
 import ./type-ir/typeIR
-ErrorBase = new(ValidatorNoTypeParameter= "Failed to find type parameter. createValidator should be called with a type parameter. Example: "createValidator<TypeName>()"",NotCalledAsFunction= "Macro should be called as function but was called as a",MoreThanOneTypeParameter= "Macro should be called with 1 type parameter but was called with",RegisterInvalidCall= ,UnregisteredType= "Tried to generate a validator for an unregistered type with name",RegisterInvalidNumberParams= "register should be called with 1 argument, but it was called with",RegisterParam1NotStringLiteral= "register's first (and only) parameter should be a string literal, which is the name of the type to register, but it was a",TypeDoesNotAcceptGenericParameters= "types don't accept generic parameters",TooManyTypeParameters= "even though it only accepts",NotEnoughTypeParameters= "type parameters even though it requires at least",InvalidTypeParameterReference= "tried to reference the default type parameter in position:")proc removePeriod(str:string): auto = 
+var ErrorBase = new(ValidatorNoTypeParameter= "Failed to find type parameter. createValidator should be called with a type parameter. Example: "createValidator<TypeName>()"",NotCalledAsFunction= "Macro should be called as function but was called as a",MoreThanOneTypeParameter= "Macro should be called with 1 type parameter but was called with",RegisterInvalidCall= ,UnregisteredType= "Tried to generate a validator for an unregistered type with name",RegisterInvalidNumberParams= "register should be called with 1 argument, but it was called with",RegisterParam1NotStringLiteral= "register's first (and only) parameter should be a string literal, which is the name of the type to register, but it was a",TypeDoesNotAcceptGenericParameters= "types don't accept generic parameters",TooManyTypeParameters= "even though it only accepts",NotEnoughTypeParameters= "type parameters even though it requires at least",InvalidTypeParameterReference= "tried to reference the default type parameter in position:")proc removePeriod(str:string): auto = 
 
 proc addNewline(str:string): auto = 
 
-Errors = new(NoTypeParameters= proc (): auto = 
+var Errors = new(NoTypeParameters= proc (): auto = 
 ,NotCalledAsFunction= proc (callType:string): auto = 
 ,MoreThanOneTypeParameter= proc (typeParams:float): auto = 
 ,InvalidRegisterCall= proc (): auto = 

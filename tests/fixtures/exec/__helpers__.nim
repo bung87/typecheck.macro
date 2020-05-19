@@ -18,7 +18,7 @@ proc getXor[T](self:1,prop1:string,prop2:string,isAlias:bool): T =
   var inputs = if Array.isArray(unresolvedInputs): unresolvedInputs else: @[unresolvedInputs]
   if inputs.len == 0:
     discard
-  var safeStringify = proc (value:): auto = 
+  var safeStringify = proc [V](value:V): auto = 
     var stringified = stringify(value)
     if stringified == undefined:
       discard

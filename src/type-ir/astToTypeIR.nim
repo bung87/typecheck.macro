@@ -20,15 +20,17 @@ proc assertPrimitiveType(type:string):  =
 proc getInterfaceIR(node:,externalTypes:Set[string]): Interface = 
   ## 2. they can have type parameters
   var typeParameterInfo = processGenericTypeParameters(node.typeParameters,externalTypes)
-interface_:Interface = newInterface(type= "interface",,body= getBodyIR(node.body.body,))  return interface_
+var interface_:Interface = newInterface(type= "interface",,body= getBodyIR(node.body.body,))  return interface_
 
 proc getTypeAliasIR(node:,externalTypes:Set[string]): TypeAlias = 
   ## but separation is good in case we implement "extends" in the future
   var typeParameterInfo = processGenericTypeParameters(node.typeParameters,externalTypes)
-alias:TypeAlias = newTypeAlias(type= "alias",,value= getIR(node.typeAnnotation,))  return alias
+var alias:TypeAlias = newTypeAlias(type= "alias",,value= getIR(node.typeAnnotation,))  return alias
 
 proc processGenericTypeParameters(node:||nil,externalTypes:Set[string]): auto = 
-typeParameterNames:seq[string] = newSeq[string]()typeParameterDefaults:seq[IR] = newSeq[IR]()typeParameterInfo = new(typeParameterNames= typeParameterNames,typeParameterDefaults= typeParameterDefaults)  if node == undefined or node == nil:
+  var typeParameterNames:seq[string] = @[]
+  var typeParameterDefaults:seq[IR] = @[]
+var typeParameterInfo = new(typeParameterNames= typeParameterNames,typeParameterDefaults= typeParameterDefaults)  if node == undefined or node == nil:
     return 
   for param in undefined.mitems:
     if param.default:
@@ -38,7 +40,9 @@ typeParameterNames:seq[string] = newSeq[string]()typeParameterDefaults:seq[IR] =
 
 proc getBodyIR(elements:seq[],state:IrGenState): ObjectPattern = 
   ## parse the body of a Typescript interface or object pattern
-indexSignatures:PartialRecord[IndexSignatureKeyType,IR] = newPartialRecord[IndexSignatureKeyType,IR]()propertySignatures:seq[PropertySignature] = newSeq[PropertySignature]()  for element in elements.mitems:
+var indexSignatures:PartialRecord[IndexSignatureKeyType,IR] = newPartialRecord[IndexSignatureKeyType,IR]()
+  var propertySignatures:seq[PropertySignature] = @[]
+  for element in elements.mitems:
     if t.isTSIndexSignature(element):
       var keyTypeAnnotation = 
       if t.isTSTypeAnnotation(keyTypeAnnotation):
@@ -72,17 +76,18 @@ indexSignatures:PartialRecord[IndexSignatureKeyType,IR] = newPartialRecord[Index
       raise newException(MacroError,"Method signatures in interfaces and type literals are not supported")
     else:
       discard
- = new(indexSignatures.number,indexSignatures.string)objectPattern:ObjectPattern = newObjectPattern(type= "objectPattern",properties= propertySignatures,,)  return objectPattern
+var  = new(indexSignatures.number,indexSignatures.string)var objectPattern:ObjectPattern = newObjectPattern(type= "objectPattern",properties= propertySignatures,,)  return objectPattern
 
 proc getTypeParameterIR(node:): IR = 
   getIR(node,)
 
 proc getIR(node:,oldState:IrGenState): IR = 
-state = new(,parent= node)  if t.isTSUnionType(node):
-    children:seq[IR] = newSeq[IR]()    for childType in undefined.mitems:
+var state = new(,parent= node)  if t.isTSUnionType(node):
+    var children:seq[IR] = @[]
+    for childType in undefined.mitems:
       children.add(getIR(childType,state))
     if hasAtLeast2Elements(children):
-      union:Union = newUnion(type= "union",childTypes= children)  return union
+      var union:Union = newUnion(type= "union",childTypes= children)  return union
     else:
       discard
   elif t.isTSParenthesizedType(node):
@@ -101,16 +106,18 @@ state = new(,parent= node)  if t.isTSUnionType(node):
     var childType = node.typeAnnotation
     getIR(childType,state)
   elif t.isTSIntersectionType(node):
-    childTypes:seq[IR] = newSeq[IR]()    for childType in undefined.mitems:
+    var childTypes:seq[IR] = @[]
+    for childType in undefined.mitems:
       childTypes.add(getIR(childType,state))
     if hasAtLeast2Elements(childTypes):
-      intersectionType:Intersection = newIntersection(type= "intersection",childTypes= childTypes)  return intersectionType
+      var intersectionType:Intersection = newIntersection(type= "intersection",childTypes= childTypes)  return intersectionType
     else:
       discard
   elif t.isTSTupleType(node):
     var firstOptionalIndex = - 1
     var restType:ArrayType = nil
-    children:seq[IR] = newSeq[IR]()    var elementTypes = node.elementTypes
+    var children:seq[IR] = @[]
+    var elementTypes = node.elementTypes
 
     var len = elementTypes.len
     var i = 0
@@ -132,13 +139,14 @@ state = new(,parent= node)  if t.isTSUnionType(node):
       firstOptionalIndex = if restType: len - 1 else: len
     if firstOptionalIndex == - 1:
       discard
-    tuple:Tuple = newTuple(type= "tuple",childTypes= children,firstOptionalIndex= firstOptionalIndex,)    return tuple
+    var tuple:Tuple = newTuple(type= "tuple",childTypes= children,firstOptionalIndex= firstOptionalIndex,)    return tuple
   elif t.isTSArrayType(node):
-    arrayLiteralType:ArrayType = newArrayType(type= "arrayType",elementType= getIR(node.elementType,state))    return arrayLiteralType
+    var arrayLiteralType:ArrayType = newArrayType(type= "arrayType",elementType= getIR(node.elementType,state))    return arrayLiteralType
   elif t.isTSTypeLiteral(node):
     getBodyIR(node.members,state)
   elif t.isTSTypeReference(node):
-    typeParameters:seq[IR] = newSeq[IR]()    if node.typeParameters:
+    var typeParameters:seq[IR] = @[]
+    if node.typeParameters:
       for param in undefined.mitems:
         typeParameters.add(getIR(param,state))
     if t.isTSQualifiedName(node.typeName):
@@ -152,26 +160,26 @@ state = new(,parent= node)  if t.isTSUnionType(node):
     if idx != - 1:
       if typeParameters.len > 0:
         throwMaybeAstError(fmt"Generic parameter  had type arguments")
-      genericType:GenericType = newGenericType(type= "genericType",typeParameterIndex= idx)  return genericType
+      var genericType:GenericType = newGenericType(type= "genericType",typeParameterIndex= idx)  return genericType
     if arrayTypeNames.includes(typeName):
       if typeParameters.len != 1:
         throwMaybeAstError(fmt"type  has 1 generic parameter but found {typeName}")
-      array:ArrayType = newArrayType(type= "arrayType",elementType= typeParameters[0])  return array
+      var array:ArrayType = newArrayType(type= "arrayType",elementType= typeParameters[0])  return array
     ## a generic parameter to the parent interface
     externalTypes.add(typeName)
-    withoutTypeParameters:Type = newType(type= "type",typeName= node.typeName.name)    if hasAtLeast1Element(typeParameters):
-      type:Type = newType(,typeParameters= typeParameters)  return type
+    var withoutTypeParameters:Type = newType(type= "type",typeName= node.typeName.name)    if hasAtLeast1Element(typeParameters):
+      var type:Type = newType(,typeParameters= typeParameters)  return type
     return withoutTypeParameters
   elif t.isTSLiteralType(node):
     var value = node.literal.value
-    literal:Literal = newLiteral(type= "literal",value= value)    return literal
+    var literal:Literal = newLiteral(type= "literal",value= value)    return literal
   elif t.isTSNumberKeyword(node) or t.isTSBigIntKeyword(node) or t.isTSStringKeyword(node) or t.isTSBooleanKeyword(node) or t.isTSObjectKeyword(node) or t.isTSNullKeyword(node) or t.isTSUndefinedKeyword(node) or t.isTSAnyKeyword(node) or t.isTSUnknownKeyword(node):
     var type = node.type
 
     ## type is "TSNumberKeyword", "TSStringKeyword", etc.
     var builtinTypeName = type.slice("TS".len,- "Keyword".len).toLowerCase()
     assertPrimitiveType(builtinTypeName)
-    builtinType:PrimitiveType = newPrimitiveType(type= "primitiveType",typeName= builtinTypeName)    return builtinType
+    var builtinType:PrimitiveType = newPrimitiveType(type= "primitiveType",typeName= builtinTypeName)    return builtinType
   elif t.isTSIntersectionType(node) or t.isTSMappedType(node):
     raise newException(MacroError,fmt"{node.type} types are not supported. File an issue with the developer if you want this.")
   else:

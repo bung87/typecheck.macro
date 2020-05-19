@@ -41,3 +41,4 @@ proc macroHandler(:MacroParams) =
         discard
     )
 
+createMacro(macroHandler)

@@ -39,7 +39,7 @@ type State* = ref object of RootObj
 
 
 proc generateValidator(ir:IR,namedTypes:Map[string,IR]): string = 
-state:State = newState(referencedTypeNames= @[],parentParamIdx= 0,parentParamName= nil,namedTypes= namedTypes)  var validator = visitIR(ir,state)
+var state:State = newState(referencedTypeNames= @[],parentParamIdx= 0,parentParamName= nil,namedTypes= namedTypes)  var validator = visitIR(ir,state)
   var paramName = getParam(state)
   if isNonEmptyValidator(validator):
     var code = validator.code
@@ -107,7 +107,7 @@ proc visitTuple(ir:Tuple,state:State): Validator[] =
       verifyNonRestElementsCode += fmt"&& {code}"
     else:
       discard
-noRestElementValidator:Validator[] = newValidator[](type= Ast.EXPR,code= fmt"{lengthCheckCode}{verifyNonRestElementsCode}{}")  if restType == undefined:
+var noRestElementValidator:Validator[] = newValidator[](type= Ast.EXPR,code= fmt"{lengthCheckCode}{verifyNonRestElementsCode}{}")  if restType == undefined:
     return noRestElementValidator
   else:
     discard
@@ -120,7 +120,8 @@ proc visitLiteral(ir:Literal,state:State): Validator[] =
   return 
 
 proc visitUnion(ir:Union,state:State): Validator[|] = 
-childTypeValidators:seq[Validator[]] = newSeq[Validator[]]()  for childType in undefined.mitems:
+  var childTypeValidators:seq[Validator[]] = @[]
+  for childType in undefined.mitems:
     var validator = visitIR(childType,state)
     if isNonEmptyValidator(validator):
       childTypeValidators.add(validator)
@@ -256,7 +257,7 @@ proc visitObjectPattern(node:ObjectPattern,state:State): Validator[Ast] =
   var destructuredKeyName = "k"
   var destructuredValueName = "v"
   var validateStringKeyCode = ""
-indexerState:State = newState(,parentParamName= destructuredValueName)  var sV = if stringIndexerType: visitIR(stringIndexerType,indexerState) else: nil
+var indexerState:State = newState(,parentParamName= destructuredValueName)  var sV = if stringIndexerType: visitIR(stringIndexerType,indexerState) else: nil
   if sV != nil and isNonEmptyValidator(sV):
     validateStringKeyCode = fmt"if (!) return false;"
   var validateNumberKeyCode = ""
