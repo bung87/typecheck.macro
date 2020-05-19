@@ -17,6 +17,11 @@ proc assertPrimitiveType(type:string):  =
   if not primitiveTypes.includes(type):
     throwUnexpectedError(fmt"{type} is not a builtin type")
 
+type IrGenState* = ref object of RootObj
+  externalTypes*:Set[string]
+  typeParameterNames*:ReadonlyArray[string]
+  parent*:|||
+
 proc getInterfaceIR(node:,externalTypes:Set[string]): Interface = 
   ## 2. they can have type parameters
   var typeParameterInfo = processGenericTypeParameters(node.typeParameters,externalTypes)
