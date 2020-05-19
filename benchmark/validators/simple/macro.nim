@@ -1,0 +1,1 @@
+import ../../../dist/typecheck.macro
