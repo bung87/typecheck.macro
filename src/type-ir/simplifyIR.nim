@@ -42,16 +42,13 @@ type State* = ref object of RootObj
 proc simplify(ir:Intersection|Union): Union|Intersection = 
   ## TODO: Implement lookup table to improve perf
   var map = Map()
-  var state = 
-  var expression = visit(ir,state)
+state = new(idx= 0,map= map,level= - 1,mustBeTrue= Set())  var expression = visit(ir,state)
   var minBitsRequired = Infinity
-  var bitConfigs:Array[Array[float]] = @[]
-  var i = 0
+bitConfigs:Array[Array[float]] = newArray[Array[float]]()  var i = 0
   while i < Math.pow(2,state.idx):
     var copy = expression.slice()
     var bitsSet = 0
-    var trueBitIdxs = @[]
-    var j = 0
+    trueBitIdxs = new()    var j = 0
     while j < i:
       var jthBitIsSet = i and 1 shl j
       if jthBitIsSet:
@@ -68,10 +65,8 @@ proc simplify(ir:Intersection|Union): Union|Intersection =
     bitConfigs.add(trueBitIdxs)
   if bitConfigs.len == 0:
     throwMaybeAstError(fmt"for type: , could not find valid type")
-  var irConfigs:seq[IR] = @[]
-  for config in bitConfigs.mitems:
-    var childTypes:seq[IR] = @[]
-    for idx in config.mitems:
+irConfigs:seq[IR] = newSeq[IR]()  for config in bitConfigs.mitems:
+childTypes:seq[IR] = newSeq[IR]()    for idx in config.mitems:
       var ir = map.get(idx)
       if ir == undefined:
         throwUnexpectedError(fmt"could not de-serialize idx  back into type")
@@ -79,8 +74,7 @@ proc simplify(ir:Intersection|Union): Union|Intersection =
     if childTypes.len == 1:
       irConfigs.add(childTypes[0])
     elif hasAtLeast2Elements(childTypes):
-      var intersection:Intersection = 
-      irConfigs.add(intersection)
+      intersection:Intersection = newIntersection(type= "intersection",childTypes= childTypes)      irConfigs.add(intersection)
     else:
       discard
   if irConfigs.len == 1:
@@ -90,8 +84,7 @@ proc simplify(ir:Intersection|Union): Union|Intersection =
     else:
       discard
   elif hasAtLeast2Elements(irConfigs):
-    var union:Union = 
-    return union
+    union:Union = newUnion(type= "union",childTypes= irConfigs)    return union
   else:
     discard
 

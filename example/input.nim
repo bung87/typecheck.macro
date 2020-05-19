@@ -21,8 +21,7 @@ var isCat = createValidator()
 console.log(isCat())
 console.log(isCat())
 var isCatOwner = createValidator()
-var cordelia:Cat = 
-console.log(isCatOwner())
+cordelia:Cat = newCat(name= "cordelia",breed= "sphynx")console.log(isCatOwner())
 ## true
 console.log(isCatOwner())
 type Personality* = ref object of RootObj
@@ -39,8 +38,7 @@ type PetOwner* = ref object of RootObj
 register("Dog")
 register("PetOwner")
 var isDogOwner = createValidator()
-var owner = 
-console.log(isDogOwner(owner))
+owner = new(name= "anthony",pet= ,personality= )console.log(isDogOwner(owner))
 ## true
 owner.pet.wagsTail = nil
 console.log(isDogOwner(owner))

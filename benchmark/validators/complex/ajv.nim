@@ -1,4 +1,3 @@
 var Ajv = require("ajv")
 var ajv = Ajv()
-var schema = 
-var validate = ajv.compile(schema)
+schema = new(anyOf= @[,,])var validate = ajv.compile(schema)
